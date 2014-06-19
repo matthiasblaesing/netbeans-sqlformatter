@@ -8,6 +8,18 @@
     <packaging>nbm</packaging>
 
     <name>sqlformatter</name>
+    
+    <developers>
+        <developer>
+            <name>Matthias Bläsing</name>
+            <id>mb</id>
+            <email>mblaesing@doppel-helix.eu</email>
+            <roles>
+                <role>Developer</role>
+            </roles>
+            <timezone>+1</timezone>
+        </developer>
+    </developers>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -86,8 +98,21 @@
                 <configuration>
                     <!-- to have the jar plugin pickup the nbm generated manifest -->
                     <useDefaultManifestFile>true</useDefaultManifestFile>
+                    <author>Matthias Bläsing</author>
                 </configuration>
             </plugin>
         </plugins>
     </build>
+    
+    <description>&lt;p&gt;Simple SQL formatter for netbeans.
+            &lt;/p&gt;
+    &lt;p&gt;Inside an SQL-File just invoke
+    the formating key-stroke (Shift-Alt-F) and the whole file will be formatted.
+    &lt;/p&gt;
+    &lt;p&gt;
+    If you want to format only parts, select the corresponding statements.
+    &lt;/p&gt;
+    &lt;p&gt;
+    Please note: the whole statement will be formatted!
+    &lt;/p&gt;</description>
 </project>
