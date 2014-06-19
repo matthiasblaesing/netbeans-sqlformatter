@@ -1,0 +1,3 @@
+Manifest-Version: 1.0
+OpenIDE-Module-Layer: eu/doppel_helix/netbeans/sqlformatter/layer.xml
+OpenIDE-Module-Localizing-Bundle: eu/doppel_helix/netbeans/sqlformatter/Bundle.properties
