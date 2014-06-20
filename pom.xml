@@ -7,7 +7,7 @@
     <version>1.0-SNAPSHOT</version>
     <packaging>nbm</packaging>
 
-    <name>sqlformatter</name>
+    <name>SQL Formatter</name>
     
     <developers>
         <developer>
@@ -78,6 +78,10 @@
                 <artifactId>nbm-maven-plugin</artifactId>
                 <version>3.13</version>
                 <extensions>true</extensions>
+                <configuration>
+                    <licenseFile>${basedir}/LICENSE</licenseFile>
+                    <licenseName>MIT License</licenseName>
+                </configuration>
             </plugin>
 
             <plugin>
@@ -98,7 +102,6 @@
                 <configuration>
                     <!-- to have the jar plugin pickup the nbm generated manifest -->
                     <useDefaultManifestFile>true</useDefaultManifestFile>
-                    <author>Matthias Bläsing</author>
                 </configuration>
             </plugin>
         </plugins>
@@ -108,11 +111,9 @@
             &lt;/p&gt;
     &lt;p&gt;Inside an SQL-File just invoke
     the formating key-stroke (Shift-Alt-F) and the whole file will be formatted.
-    &lt;/p&gt;
-    &lt;p&gt;
     If you want to format only parts, select the corresponding statements.
     &lt;/p&gt;
     &lt;p&gt;
-    Please note: the whole statement will be formatted!
+    &lt;b&gt;Please note:&lt;/b&gt; the whole statement will be formatted!
     &lt;/p&gt;</description>
 </project>

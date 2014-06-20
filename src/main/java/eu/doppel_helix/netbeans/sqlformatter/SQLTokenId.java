@@ -38,43 +38,35 @@
  * Contributor(s):
  *
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
+ *
+ *
+ * This is stripped as far as possible to make it usable with the netbeans lexer
+ * it is assumed, that this stripped down version of the SQLTokenId code can
+ * be used out of interoperability concerns.
  */
 
 package eu.doppel_helix.netbeans.sqlformatter;
 
 import org.netbeans.api.lexer.TokenId;
 
-/**
- * Mostly a copy from the netbeans sql lexer package
- * 
- * @author Andrei Badea
- */
-public enum SQLTokenId implements TokenId {
-    WHITESPACE("sql-whitespace"), // NOI18N
-    LINE_COMMENT("sql-line-comment"), // NOI18N
-    BLOCK_COMMENT("sql-block-comment"), // NOI18N
-    STRING("sql-string-literal"), // NOI18N
-    INCOMPLETE_STRING("sql-errors"), // NOI18N
-    INCOMPLETE_IDENTIFIER("sql-errors"), // NOI18N
-    IDENTIFIER("sql-identifier"), // NOI18N
-    OPERATOR("sql-operator"), // NOI18N
-    LPAREN("sql-operator"), // NOI18N
-    RPAREN("sql-operator"), // NOI18N
-    DOT("sql-dot"), // NOI18N
-    COMMA("sql-operator"), //  // NOI18N XXX or have own category?
-    INT_LITERAL("sql-int-literal"),  // NOI18N
-    DOUBLE_LITERAL("sql-double-literal"), // NOI18N
-    KEYWORD("sql-keyword"); // NOI18N
+public enum SQLTokenId {
+    WHITESPACE,
+    LINE_COMMENT,
+    BLOCK_COMMENT,
+    STRING,
+    INCOMPLETE_STRING,
+    INCOMPLETE_IDENTIFIER,
+    IDENTIFIER,
+    OPERATOR,
+    LPAREN,
+    RPAREN,
+    DOT,
+    COMMA,
+    INT_LITERAL,
+    DOUBLE_LITERAL,
+    KEYWORD;
 
-    private final String primaryCategory;
-
-    private SQLTokenId(String primaryCategory) {
-        this.primaryCategory = primaryCategory;
-
-    }
-
-    public String primaryCategory() {
-        return primaryCategory;
+    private SQLTokenId() {
     }
     
     public boolean matches(TokenId id) {
