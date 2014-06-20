@@ -79,6 +79,7 @@
                 <version>3.13</version>
                 <extensions>true</extensions>
                 <configuration>
+                    <author>Matthias Bläsing</author>
                     <licenseFile>${basedir}/LICENSE</licenseFile>
                     <licenseName>MIT License</licenseName>
                 </configuration>
