@@ -459,9 +459,9 @@ public class Formatter implements ReformatTask {
         Integer longestMatch = null;
         for(List<String> candidate: candidates) {
             if(candidate.get(0).equalsIgnoreCase(value)) {
-                if(candidate.size() == 1) {
+                if(candidate.size() == 1 && (longestMatch == null || longestMatch < 1)) {
                     longestMatch = tokenLength;
-                } else {
+                } else if (candidate.size() > 1) {
                     Integer subMatch = longestCiMatchIgoreWhitespace(ts, pos, Collections.singletonList(candidate.subList(1, candidate.size())));
                     if(subMatch != null) {
                         int currentMatch = subMatch + tokenLength;
