@@ -34,7 +34,9 @@ package eu.doppel_helix.netbeans.sqlformatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import org.netbeans.api.lexer.Language;
@@ -100,7 +102,7 @@ public class Formatter implements ReformatTask {
             Arrays.asList("EXCEPT"), 
             Arrays.asList("INTERSECT")
     );
-    
+
     @Override
     public void reformat() throws BadLocationException {
         Document d = context.document();
@@ -159,12 +161,17 @@ public class Formatter implements ReformatTask {
         d.insertString(tokenStartPos, newSQL, null);
     }
 
-    private String formatSQL(List<Token> originalTokenList) {
+    // This is package access scoped to be able to directly test this method
+    String formatSQL(List<Token> originalTokenList) {
         List<Token> tokenList = new ArrayList<>();
         
-        for(Token t: originalTokenList) {
+        Map<Integer,Integer> originalPos = new HashMap<>();
+        
+        for(int i = 0; i < originalTokenList.size(); i++) {
+            Token t = originalTokenList.get(i);
             if(! SQLTokenId.WHITESPACE.matches(t.id())) {
                 tokenList.add(t);
+                originalPos.put(tokenList.size() - 1, i);
             }
         }
         
@@ -204,6 +211,8 @@ public class Formatter implements ReformatTask {
             
             // If we need a new line before the token
             if(newline) {
+                // Prevent trailing spaces on new lines
+                rtrim(sb, ' ');
                 sb.append("\n");
                 appendIterated(sb, tab, indent_level);
                 newline = false;
@@ -214,14 +223,25 @@ public class Formatter implements ReformatTask {
             
             // Display comments directly where they appear in the source
             if (SQLTokenId.LINE_COMMENT.matches(t.id()) || SQLTokenId.BLOCK_COMMENT.matches(t.id())) {
-                if (SQLTokenId.BLOCK_COMMENT.matches(t.id())) {
-                    String indent = createRepeated(tab, indent_level);
+                tokenText = tokenText.trim();
+                // Multiline comments are aligned to left
+                if(tokenText.contains("\n")) {
+                    rtrim(sb, null);
                     sb.append("\n");
-                    sb.append(indent);
-                    sb.append(tokenText.replace("\n","\n" + indent));
+                    sb.append(tokenText);
+                } else if ((currentLineFill(sb) + tokenText.length()) < 120) {
+                    if(! added_newline) {
+                        rtrim(sb, ' ');
+                        sb.append(" ");
+                    }
+                    sb.append(tokenText);
                 } else {
+                    rtrim(sb, null);
+                    sb.append("\n");
+                    appendIterated(sb, tab, indent_level);
                     sb.append(tokenText);
                 }
+                rtrim(sb, '\n');
                 newline = true;
                 continue;
             }
@@ -297,6 +317,13 @@ public class Formatter implements ReformatTask {
                     newline = true;
                 }
 
+                Integer originialTokenPos = originalPos.get(i);
+                if(originialTokenPos != null && originialTokenPos > 0 &&
+                        (! SQLTokenId.WHITESPACE.matches(
+                                originalTokenList.get(originialTokenPos - 1).id()))) {
+                    rtrim(sb, ' ');
+                }
+                
                 if (!inline_parentheses) {
                     increase_block_indent = true;
                     // Add a newline after the parentheses
@@ -350,6 +377,7 @@ public class Formatter implements ReformatTask {
                 newline = true;
                 // Add a newline before the top level reserved word (if not already added)
                 if ((!added_newline) && sb.length() > 0) {
+                    rtrim(sb, ' ');
                     sb.append("\n");
                     appendIterated(sb, tab, indent_level);
                 }
@@ -399,6 +427,7 @@ public class Formatter implements ReformatTask {
             else if (longestCiMatchIgoreWhitespace(tokenList, i, reserved_newline) != null) {
                 // Add a newline before the reserved word (if not already added)
                 if (! added_newline) {
+                    rtrim(sb, ' ');
                     sb.append("\n");
                     appendIterated(sb, tab, indent_level);
                 }
@@ -437,7 +466,8 @@ public class Formatter implements ReformatTask {
             }
         }
         
-        return(sb.toString().replace("\t", "    "));
+        rtrim(sb, ' ');
+        return(sb.toString().replace("\t", "  "));
     }
 
     private Integer longestCiMatchIgoreWhitespace(List<Token> ts, int pos, List<List<String>> candidates) {
@@ -482,7 +512,8 @@ public class Formatter implements ReformatTask {
             if(deleteStart == 0) {
                 break;
             }
-            if((c == null && Character.isWhitespace(sb.charAt(deleteStart - 1))) || c == sb.charAt(deleteStart - 1)) {
+            if((c == null && Character.isWhitespace(sb.charAt(deleteStart - 1))) 
+                    || (c != null && c == sb.charAt(deleteStart - 1))) {
                 deleteStart--;
             } else {
                 break;
@@ -492,13 +523,15 @@ public class Formatter implements ReformatTask {
             sb.delete(deleteStart, lastIdx);
         }
     }
-    
-    private String createRepeated(String string, int count) {
-        StringBuilder sb = new StringBuilder(string.length() * count);
-        for(int i = 0; i < count; i++) {
-            sb.append(string);
+
+    private int currentLineFill(StringBuilder sb) {
+        int lastIdx = sb.length() - 1;
+        for(int i = lastIdx; i > 0; i--) {
+            if(sb.charAt(i) == '\n') {
+                return lastIdx - i;
+            }
         }
-        return sb.toString();
+        return lastIdx;
     }
     
     private void appendIterated(StringBuilder sb, String input, int count) {

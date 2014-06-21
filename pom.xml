@@ -66,6 +66,12 @@
         <dependency>
             <groupId>org.netbeans.modules</groupId>
             <artifactId>org-netbeans-modules-db-sql-editor</artifactId>
+            <version>RELEASE80</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-netbeans-modules-nbjunit</artifactId>
             <version>RELEASE73</version>
             <scope>test</scope>
         </dependency>
