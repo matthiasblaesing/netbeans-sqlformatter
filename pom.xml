@@ -1,5 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>eu.doppel_helix.netbeans</groupId>
@@ -40,6 +40,12 @@
             </snapshots>
         </repository>
     </repositories>
+    
+    <scm>
+        <connection>scm:git:https://github.com/matthiasblaesing/netbeans-sqlformatter.git</connection>
+        <developerConnection>scm:git:git@github.com:matthiasblaesing/netbeans-sqlformatter.git</developerConnection>
+        <url>https://github.com/matthiasblaesing/netbeans-sqlformatter</url>
+    </scm>
 
     <dependencies>
         <dependency>
@@ -117,8 +123,8 @@
     <description>&lt;p&gt;Simple SQL formatter for netbeans.
             &lt;/p&gt;
     &lt;p&gt;Inside an SQL-File just invoke
-    the formating key-stroke (Shift-Alt-F) and the whole file will be formatted.
-    If you want to format only parts, select the corresponding statements.
+        the formating key-stroke (Shift-Alt-F) and the whole file will be formatted.
+        If you want to format only parts, select the corresponding statements.
     &lt;/p&gt;
     &lt;p&gt;
     &lt;b&gt;Please note:&lt;/b&gt; the whole statement will be formatted!
