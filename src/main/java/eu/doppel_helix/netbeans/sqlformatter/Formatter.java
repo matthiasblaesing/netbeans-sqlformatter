@@ -37,12 +37,15 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import org.netbeans.api.lexer.Language;
 import org.netbeans.api.lexer.Token;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenSequence;
+import org.netbeans.modules.editor.indent.api.IndentUtils;
 import org.netbeans.modules.editor.indent.spi.Context;
 import org.netbeans.modules.editor.indent.spi.ExtraLock;
 import org.netbeans.modules.editor.indent.spi.ReformatTask;
@@ -155,14 +158,18 @@ public class Formatter implements ReformatTask {
         int tokenStartPos = tokens.get(startIdx).offset(th);
         int tokenEndPos = tokens.get(endIdx).offset(th) + tokens.get(endIdx).length();
         
-        String newSQL = formatSQL(tokens.subList(startIdx, endIdx + 1));
+        String newSQL = formatSQL(
+                tokens.subList(startIdx, endIdx + 1), 
+                IndentUtils.indentLevelSize(d),
+                IndentUtils.isExpandTabs(d),
+                IndentUtils.tabSize(d));
         
         d.remove(tokenStartPos, tokenEndPos - tokenStartPos);
         d.insertString(tokenStartPos, newSQL, null);
     }
 
     // This is package access scoped to be able to directly test this method
-    String formatSQL(List<Token> originalTokenList) {
+    String formatSQL(List<Token> originalTokenList, int levelSize, boolean expandTabs, int tabSize) {
         List<Token> tokenList = new ArrayList<>();
         
         Map<Integer,Integer> originalPos = new HashMap<>();
@@ -175,8 +182,9 @@ public class Formatter implements ReformatTask {
             }
         }
         
-        // Use an actual tab while formatting and then switch out with self::$tab at the end
-        String tab = "\t";
+        // Asumption: ASCII NULL is not part of the String - this is at least
+        // a better asumption than using the tab character
+        char tab = '\u0000';
 
         int indent_level = 0;
         boolean newline = false;
@@ -383,7 +391,7 @@ public class Formatter implements ReformatTask {
                 }
                 // If we already added a newline, redo the indentation since it may be different now
                 else {
-                    rtrim(sb, '\t');
+                    rtrim(sb, tab);
                     appendIterated(sb, tab, indent_level);
                 }
 
@@ -467,7 +475,27 @@ public class Formatter implements ReformatTask {
         }
         
         rtrim(sb, ' ');
-        return(sb.toString().replace("\t", "  "));
+        
+        Integer end = null;
+        for(int i = sb.length() - 1; i >= 0; i--) {
+            if(end == null && sb.charAt(i) == tab) {
+                end = i;
+            } else if (sb.charAt(i) != tab && end != null) {
+                int start = i + 1;
+                int levels = (end - start + 1) * levelSize;
+                String replacement = IndentUtils.createIndentString(levels, expandTabs, tabSize);
+                sb.replace(start, end + 1, replacement);
+                end = null;
+            }
+        }
+        if (end != null) {
+            int start = 0;
+            int levels = (end - start + 1) * levelSize;
+            String replacement = IndentUtils.createIndentString(levels, expandTabs, tabSize);
+            sb.replace(start, end + 1, replacement);
+        }
+        
+        return sb.toString();
     }
 
     private Integer longestCiMatchIgoreWhitespace(List<Token> ts, int pos, List<List<String>> candidates) {
@@ -512,8 +540,9 @@ public class Formatter implements ReformatTask {
             if(deleteStart == 0) {
                 break;
             }
-            if((c == null && Character.isWhitespace(sb.charAt(deleteStart - 1))) 
-                    || (c != null && c == sb.charAt(deleteStart - 1))) {
+            char nextChar = sb.charAt(deleteStart - 1);
+            if((c == null && (Character.isWhitespace(nextChar) || nextChar == '\u0000')) 
+                    || (c != null && c == nextChar)) {
                 deleteStart--;
             } else {
                 break;
@@ -534,7 +563,7 @@ public class Formatter implements ReformatTask {
         return lastIdx;
     }
     
-    private void appendIterated(StringBuilder sb, String input, int count) {
+    private void appendIterated(StringBuilder sb, char input, int count) {
         for(int i = 0; i < count; i++) {
             sb.append(input);
         }

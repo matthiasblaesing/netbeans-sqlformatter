@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 import javax.swing.text.BadLocationException;
+import static junit.framework.Assert.assertEquals;
 import org.junit.Test;
 import org.netbeans.api.lexer.Language;
 import org.netbeans.api.lexer.Token;
@@ -91,9 +92,28 @@ public class FormatterTest extends NbTestCase {
         String[] referenceSql = readTestFile("golden.sql");
         assertEquals(testSql.length, referenceSql.length);
         for(int i = 0; i < testSql.length; i++) {
-            String reformatted = f.formatSQL(tokenSequence(testSql[i]));
+            String reformatted = f.formatSQL(tokenSequence(testSql[i]), 2, true, 8);
             assertEquals("SQL Comparison failed [" + i + "]", referenceSql[i], reformatted);
         }
-    } 
-    
+    }
+
+    @Test
+    public void testTabHandling() throws BadLocationException, IOException {
+        Formatter f = new Formatter(null);
+        String[] testSql = readTestFile("tab_replacement_input.sql");
+        String[] referenceSql = readTestFile("tab_replacement_golden.sql");
+        assertEquals(testSql.length, referenceSql.length);
+        // The first SQL should contain one tab as indent (where indent level is 2,
+        // seventh line in formatted output)
+        String reformatted = f.formatSQL(tokenSequence(testSql[0]), 4, false, 8);
+        assertEquals(referenceSql[0], reformatted);
+        // The second SQL should contain eight spaces as indent (where indent level is 2,
+        // seventh line in formatted output)
+        reformatted = f.formatSQL(tokenSequence(testSql[1]), 4, true, 8);
+        assertEquals(referenceSql[1], reformatted);
+        // The second SQL should contain one tab and four spaces as indent 
+        // (where indent level is 3, eighth line in formatted output)
+        reformatted = f.formatSQL(tokenSequence(testSql[2]), 4, false, 8);
+        assertEquals(referenceSql[2], reformatted);
+    }
 }

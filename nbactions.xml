@@ -7,4 +7,14 @@
                 <goal>release:prepare</goal>
             </goals>
         </action>
+        <action>
+            <actionName>CUSTOM-build without tests</actionName>
+            <displayName>build without tests</displayName>
+            <goals>
+                <goal>install</goal>
+            </goals>
+            <properties>
+                <skipTests>true</skipTests>
+            </properties>
+        </action>
     </actions>
