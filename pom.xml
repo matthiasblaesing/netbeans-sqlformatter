@@ -3,7 +3,7 @@
 
     <groupId>eu.doppel_helix.netbeans</groupId>
     <artifactId>sqlformatter</artifactId>
-    <version>1.1</version>
+    <version>1.2-SNAPSHOT</version>
     <packaging>nbm</packaging>
 
     <name>SQL Formatter</name>
