@@ -237,7 +237,7 @@ public class Formatter implements ReformatTask {
                     rtrim(sb, null);
                     sb.append("\n");
                     sb.append(tokenText);
-                } else if ((currentLineFill(sb) + tokenText.length()) < 120) {
+                } else if ((currentLineFill(sb, levelSize, tab) + tokenText.length()) < 90) {
                     if(! added_newline) {
                         rtrim(sb, ' ');
                         sb.append(" ");
@@ -553,14 +553,19 @@ public class Formatter implements ReformatTask {
         }
     }
 
-    private int currentLineFill(StringBuilder sb) {
+    static int currentLineFill(StringBuilder sb, int indentSize, char tabChar) {
         int lastIdx = sb.length() - 1;
+        int fill = 0;
         for(int i = lastIdx; i > 0; i--) {
-            if(sb.charAt(i) == '\n') {
-                return lastIdx - i;
+            if(sb.charAt(i) == tabChar) {
+                fill += indentSize;
+            } else if(sb.charAt(i) == '\n') {
+                break;
+            } else {
+                fill++;
             }
         }
-        return lastIdx;
+        return fill;
     }
     
     private void appendIterated(StringBuilder sb, char input, int count) {

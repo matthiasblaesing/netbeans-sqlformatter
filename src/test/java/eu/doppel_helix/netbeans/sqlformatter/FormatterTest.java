@@ -116,4 +116,15 @@ public class FormatterTest extends NbTestCase {
         reformatted = f.formatSQL(tokenSequence(testSql[2]), 4, false, 8);
         assertEquals(referenceSql[2], reformatted);
     }
+    
+    public void testLineLengthCalculation() {
+        StringBuilder sb = new StringBuilder("\ntest");
+        assertEquals(4, Formatter.currentLineFill(sb, 4, '\u0000'));
+        sb = new StringBuilder("\ntest\u0000");
+        assertEquals(8, Formatter.currentLineFill(sb, 4, '\u0000'));
+        sb = new StringBuilder("\n\u0000test");
+        assertEquals(8, Formatter.currentLineFill(sb, 4, '\u0000'));
+        sb = new StringBuilder("uselessfill\n\u0000\u0000te");
+        assertEquals(10, Formatter.currentLineFill(sb, 4, '\u0000'));
+    }
 }
