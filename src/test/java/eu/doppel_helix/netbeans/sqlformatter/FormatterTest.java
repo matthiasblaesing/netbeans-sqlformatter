@@ -117,6 +117,7 @@ public class FormatterTest extends NbTestCase {
         assertEquals(referenceSql[2], reformatted);
     }
     
+    @Test
     public void testLineLengthCalculation() {
         StringBuilder sb = new StringBuilder("\ntest");
         assertEquals(4, Formatter.currentLineFill(sb, 4, '\u0000'));
@@ -126,5 +127,20 @@ public class FormatterTest extends NbTestCase {
         assertEquals(8, Formatter.currentLineFill(sb, 4, '\u0000'));
         sb = new StringBuilder("uselessfill\n\u0000\u0000te");
         assertEquals(10, Formatter.currentLineFill(sb, 4, '\u0000'));
+    }
+    
+    @Test
+    public void testOperatorHandling() {
+        // Verify correct operator handling the netbeans lexer lexed the not-equal
+        // operator <> into two tokens ("<" and ">") - fixes for this problem
+        // should get into netbeans 8.0.1/8.1 (however it will be called)
+        Formatter f = new Formatter(null);
+        String[] testSql = readTestFile("operator_input.sql");
+        String[] referenceSql = readTestFile("operator_golden.sql");
+        assertEquals(testSql.length, referenceSql.length);
+        for (int i = 0; i < testSql.length; i++) {
+            String reformatted = f.formatSQL(tokenSequence(testSql[i]), 4, true, 8);
+            assertEquals("SQL Comparison failed [" + i + "]", referenceSql[i], reformatted);
+        }
     }
 }
